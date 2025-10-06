@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Programar correo</title>
+</head>
+<body>
+  <h1>Programar envío de correo</h1>
+
+  <form id="scheduleForm">
+    <label>
+      Correo destinatario:
+      <input type="email" id="to" name="to" required />
+    </label>
+    <br><br>
+
+    <label>
+      Fecha y hora de envío:
+      <!-- datetime-local no incluye zona; el backend decide cómo interpretarlo -->
+      <input type="datetime-local" id="dateTime" name="dateTime" required />
+    </label>
+    <br><br>
+
+    <label>
+      NRC del curso:
+      <input type="text" id="nrc" name="nrc" required />
+    </label>
+    <br><br>
+
+    <button type="submit">Programar</button>
+  </form>
+
+  <div id="result" aria-live="polite" style="margin-top:16px;"></div>
+
+  <script>
+    const form = document.getElementById('scheduleForm');
+    const resultDiv = document.getElementById('result');
+
+    function show(msg, isError = false) {
+      resultDiv.textContent = '';
+      const p = document.createElement('pre');
+      p.style.whiteSpace = 'pre-wrap';
+      p.textContent = msg;
+      if (isError) p.style.color = 'crimson';
+      resultDiv.appendChild(p);
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+
+      const to = document.getElementById('to').value.trim();
+      const dateTime = document.getElementById('dateTime').value; // formato: "YYYY-MM-DDTHH:mm"
+      const nrc = document.getElementById('nrc').value.trim();
+
+      // validación simple
+      if (!to || !dateTime || !nrc) {
+        show('Faltan datos. Completa todos los campos.', true);
+        return;
+      }
+
+      // construir payload
+      const payload = { to, dateTime, nrc };
+
+      // mostrar feedback
+      show('Enviando petición...');
+
+      try {
+        const res = await fetch('/backend/schedule', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const text = await res.text(); // intentamos texto por si el backend no devuelve JSON válido
+        let parsed;
+        try {
+          parsed = JSON.parse(text);
+        } catch (err) {
+          // no json, lo mostramos tal cual
+        }
+
+        if (res.ok) {
+          // preferimos mostrar JSON bonito si viene así
+          if (parsed) {
+            show('Respuesta OK:\n' + JSON.stringify(parsed, null, 2));
+          } else {
+            show('Respuesta OK:\n' + text);
+          }
+        } else {
+          // error HTTP
+          const statusMsg = `Error ${res.status} ${res.statusText}`;
+          if (parsed) {
+            show(statusMsg + '\n' + JSON.stringify(parsed, null, 2), true);
+          } else {
+            show(statusMsg + '\n' + text, true);
+          }
+        }
+
+      } catch (err) {
+        show('Error de red o interno al hacer la petición:\n' + err.toString(), true);
+      }
+    });
+  </script>
+</body>
+</html>
