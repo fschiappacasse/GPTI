@@ -1,34 +1,32 @@
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const { DateTime } = require('luxon');
 const axios = require('axios');
+const formData = require("form-data");
+const Mailgun = require("mailgun.js");
+const sgMail = require('@sendgrid/mail')
 
-// Configuración del transporter (ejemplo con Gmail)
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'buscacuposuc@gmail.com',
-    pass: 'zmuv yksx smoz cajz'
-  }
-});
 
-// Función para enviar mail
-function sendMail(to, subject, html) {
-  const mailOptions = {
-    from: 'buscacuposuc@gmail.com',
-    to,
+
+// Configura tu API key de SendGrid
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// Función para enviar correos
+async function sendMail(to, subject, html) {
+  const msg = {
+    to, // destinatario
+    from: 'buscacuposuc@gmail.com', // debe ser un correo verificado en SendGrid
     subject,
-    html
-
+    html,
   };
 
-  return transporter.sendMail(mailOptions)
-    .then(info => {
-      console.log('Correo enviado:', info.response);
-    })
-    .catch(error => {
-      console.error('Error al enviar el correo:', error);
-    });
+  try {
+    const result = await sgMail.send(msg);
+    console.log('Correo enviado:', result);
+  } catch (error) {
+    console.error('Error al enviar el correo:', error.response ? error.response.body : error);
+  }
 }
 
 const schedule = require('node-schedule');

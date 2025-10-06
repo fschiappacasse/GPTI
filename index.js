@@ -1,21 +1,21 @@
+require('dotenv').config(); 
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const { scheduleMail } = require('./backend/sendEmail');
 
 const app = express();
-const PORT = 3000;
-
+const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
-// Servir archivos estáticos desde la carpeta 'frontend'
+// frontend   
 app.use(express.static(path.join(__dirname, 'frontend')));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'index.html'));
 });
 
-// Ruta para programar envío de correo
+// Ruta para programar envío de correo / llamado a Api después de un tiempo
 app.post('/backend/schedule', (req, res) => {
   const { to, dateTime, nrc } = req.body;
   if (!to || !dateTime || !nrc) {
