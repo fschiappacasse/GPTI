@@ -32,28 +32,38 @@ async function sendMail(to, subject, html) {
 const schedule = require('node-schedule');
 
 // scheduleMail: programa un correo para una fecha y hora específicas, además llama a el curso 
-function scheduleMail(to, dateTimeUTC3, nrc) {
-  const chileTime = DateTime.fromISO(dateTimeUTC3, { zone: 'America/Santiago' });
+function scheduleMail(to, dateTimeUTC3, nrcList) {
+  if (nrcList.length === 0) {
+    throw new Error("Debes proporcionar al menos un NRC.");
+  }
+  if (nrcList.length > 10) {
+    throw new Error("Solo se permite un máximo de 10 NRCs por correo.");
+  }
+
+  const chileTime = DateTime.fromISO(dateTimeUTC3, { zone: "America/Santiago" });
   const jsDate = chileTime.toJSDate();
 
-  console.log(`Programando correo para ${chileTime.toFormat('dd/MM/yyyy HH:mm:ss')}`);
+  console.log(`📅 Programando correo para ${chileTime.toFormat("dd/MM/yyyy HH:mm:ss")}`);
 
   schedule.scheduleJob(jsDate, async () => {
-    const subject = "Aviso BuscaCuposUC - Estado del curso";
-    // `https://buscacursos.uc.cl/?cxml_semestre=2025-2&cxml_nrc=${nrc}`;
-    // https://buscacursos.uc.cl/informacionVacReserva.ajax.php?nrc=13747&termcode=2025-2
-    const url = `https://buscacursos.uc.cl/informacionVacReserva.ajax.php?nrc=${nrc}&termcode=2025-2`;
-    try {
-      const response = await axios.get(url);
-      const html = response.data;
-      await sendMail(to, subject, html);
-    } catch (error) {
-      console.error('Error obteniendo HTML:', error);
-      await sendMail(to, subject, 'No se pudo obtener el estado del curso.');
+    const subject = "Aviso BuscaCuposUC - Estado de cursos";
+    let combinedHtml = `<h2>Estado de cursos (NRCs)</h2><ul>`;
+
+    for (const nrc of nrcList) {
+      const url = `https://buscacursos.uc.cl/informacionVacReserva.ajax.php?nrc=${nrc}&termcode=2025-2`;
+      try {
+        const response = await axios.get(url);
+        combinedHtml += `<li><strong>NRC ${nrc}:</strong><br>${response.data}</li><br>`;
+      } catch (error) {
+        console.error(`Error obteniendo HTML del NRC ${nrc}:`, error);
+        combinedHtml += `<li><strong>NRC ${nrc}:</strong> No se pudo obtener el estado del curso.</li><br>`;
+      }
     }
+
+    combinedHtml += "</ul>";
+    await sendMail(to, subject, combinedHtml);
   });
 }
-
 
 module.exports = { scheduleMail };
 

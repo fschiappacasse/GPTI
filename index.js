@@ -17,14 +17,26 @@ app.get('/', (req, res) => {
 
 // Ruta para programar envío de correo / llamado a Api después de un tiempo
 app.post('/backend/schedule', (req, res) => {
-  const { to, dateTime, nrc } = req.body;
-  if (!to || !dateTime || !nrc) {
-    return res.status(400).json({ ok: false, message: 'Faltan datos.' });
+  const { to, dateTime, nrcList } = req.body;
+
+  // Validación
+  if (!to || !dateTime || !Array.isArray(nrcList) || nrcList.length === 0) {
+    return res.status(400).json({ ok: false, message: 'Faltan datos o la lista de NRCs es inválida.' });
   }
 
-  scheduleMail(to, dateTime, nrc);
-  res.json({ ok: true, message: 'Correo programado correctamente.' });
+  try {
+    scheduleMail(to, dateTime, nrcList);
+    res.json({
+      ok: true,
+      message: `Correo programado correctamente para ${to}`,
+      nrcs: nrcList,
+    });
+  } catch (error) {
+    console.error('Error programando correo:', error);
+    res.status(500).json({ ok: false, message: 'Error interno del servidor.' });
+  }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
