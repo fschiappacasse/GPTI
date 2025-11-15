@@ -38,6 +38,26 @@ app.post('/backend/schedule', (req, res) => {
 });
 
 
+app.get("/api/buscacursos", async (req, res) => {
+  const sigla = req.query.sigla || "";
+  const nombre = req.query.nombre || "";
+
+  const url = `https://buscacursos.uc.cl/?cxml_semestre=2025-2&cxml_sigla=${encodeURIComponent(sigla)}&cxml_nombre=${encodeURIComponent(nombre)}&cxml_nrc=`;
+ 
+  
+  try {
+    const response = await fetch(url);
+    const html = await response.text();
+    console.log(html)
+
+    res.send(html);   // devolvemos el HTML al cliente
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching data");
+  }
+});
+
+
 app.listen(PORT, () => {
   console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
 });
