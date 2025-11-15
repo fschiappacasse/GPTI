@@ -149,6 +149,24 @@
     </div>
 
   <script>
+
+function extraerNRCs(doc) {
+  const nrcs = [];
+  const filas = doc.querySelectorAll("table tr");
+
+  filas.forEach(row => {
+    const celdas = row.querySelectorAll("td");
+    if (celdas.length > 0) {
+      const posibleNRC = celdas[0].innerText.trim();
+      if (/^\d{5}$/.test(posibleNRC)) {
+        nrcs.push(posibleNRC);
+      }
+    }
+  });
+
+  return nrcs;
+}
+
   const form = document.getElementById("scheduleForm");
   const nombreInput = document.getElementById("nombre");
   const siglaInput = document.getElementById("sigla");
@@ -175,10 +193,46 @@
         const html = await res.text();
 
         iframe.srcdoc = html;
+        // Esperamos un instante a que el iframe procese el HTML
 
+        setTimeout(() => {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
 
-      // 👉 Mostrar el HTML dentro del iframe
-      //iframe.srcdoc = html;
+            // Buscar todas las filas de la tabla
+            const filas = doc.querySelectorAll("table tr");
+
+            filas.forEach(row => {
+                const celdas = row.querySelectorAll("td");
+                if (celdas.length === 0) return;
+
+                const posibleNRC = celdas[0].innerText.trim();
+
+                // Si la primera celda es un NRC válido
+                if (/^\d{5}$/.test(posibleNRC)) {
+
+                // Crear botón individual
+                const btn = doc.createElement("button");
+                btn.textContent = "Agregar NRC";
+                btn.style.cssText =
+                    "margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer;";
+
+                // Acción del botón
+                btn.addEventListener("click", () => {
+                    let existentes = JSON.parse(sessionStorage.getItem("nrc_importados") || "[]");
+                    if (!existentes.includes(posibleNRC)) {
+                    existentes.push(posibleNRC);
+                    }
+
+                    sessionStorage.setItem("nrc_importados", JSON.stringify(existentes));
+
+                    window.location.href = "index.html";
+                });
+
+                // Insertar botón en la fila, al lado del NRC
+                celdas[0].appendChild(btn);
+                }
+            });
+            }, 200);
 
     } catch (err) {
       iframe.contentDocument.body.innerHTML = "<p style='color:red;'>Error realizando GET</p>";

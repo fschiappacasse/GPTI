@@ -131,13 +131,20 @@
       <input type="datetime-local" id="dateTime" name="dateTime" required />
 
       <label>NRC(s) del curso:</label>
-      <div id="nrcContainer">
-        <div class="nrc-item">
-          <input type="text" name="nrc" class="nrcInput" placeholder="Ej: 13747" required />
+        <div id="nrcContainer">
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="Ej: 13747" required /></div>
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
+          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
         </div>
-      </div>
 
-      <button type="button" id="addNrcBtn"> + Agregar otro NRC</button>
+
+
       <button type="submit" id="submitBtn"> Programar correo</button>
     </form>
 
@@ -213,6 +220,23 @@
       resultDiv.textContent = msg;
       resultDiv.className = isError ? "error" : "";
     }
+
+
+  window.addEventListener("DOMContentLoaded", () => {
+  const data = sessionStorage.getItem("nrc_importados");
+  if (!data) return;
+
+  const nrcs = JSON.parse(data);
+
+  const inputs = document.querySelectorAll(".nrcInput");
+
+  
+  inputs.forEach((input, i) => {
+    input.value = nrcs[i] || ""; 
+  });
+});
+
+
   </script>
 </body>
 </html>
