@@ -2,8 +2,9 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const { scheduleMail } = require('./backend/sendEmail');
-
+const { scheduleMail,  scheduleMail2} = require('./backend/sendEmail');
+const cheerio = require("cheerio");
+const { Console } = require('console');
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
@@ -19,7 +20,6 @@ app.get('/', (req, res) => {
 app.post('/backend/schedule', (req, res) => {
   const { to, dateTime, nrcList } = req.body;
 
-  // Validación
   if (!to || !dateTime || !Array.isArray(nrcList) || nrcList.length === 0) {
     return res.status(400).json({ ok: false, message: 'Faltan datos o la lista de NRCs es inválida.' });
   }
@@ -37,10 +37,7 @@ app.post('/backend/schedule', (req, res) => {
   }
 });
 
-
-// Asegúrate de: npm install cheerio
-const cheerio = require("cheerio");
-
+//  Llamado para buscar un curso (maneja html tambien)
 app.get("/api/buscacursos", async (req, res) => {
   const siglaQ = req.query.sigla || "";
   const nombreQ = req.query.nombre || "";
@@ -54,83 +51,28 @@ app.get("/api/buscacursos", async (req, res) => {
 
     const $ = cheerio.load(html);
 
-    // Seleccionamos sólo las filas que contienen resultados reales
+
     const rows = [];
+    //las siguientes lineas son parabuscar la info especifica dentro del html que devuelve el buscacursos
     $("tr.resultadosRowPar, tr.resultadosRowImpar").each((i, row) => {
       const $row = $(row);
       const tds = $row.find("td");
 
-      // Protección: debe tener al menos algunas celdas
-      if (tds.length < 6) return;
-
-      // NRC (primer td)
-      const nrc = $(tds[0]).text().trim();
-
-      // Sigla (segundo td) — limpiar íconos, etc.
-      let sigla = $(tds[1]).text().replace(/\s+/g, " ").trim();
-      // normalmente contiene "EYP1113" + quizás iconos o texto
-      // intentamos sacar la primera palabra que parece sigla
-      const siglaMatch = sigla.match(/[A-ZÑÁÉÍÓÚ0-9\-]{2,}/i);
-      if (siglaMatch) sigla = siglaMatch[0];
-
-      // Sección (usualmente en la columna índice 4)
-      const seccion = $(tds[4]).text().trim();
-
-      // Nombre del curso: preferimos el atributo title del segundo td (tooltip)
-      let nombre = $(tds[1]).attr("title");
-      if (nombre) {
-        // title suele tener "EYP1113 Probabilidades y Estadística"
-        nombre = nombre.replace(/^[^\s]+\s*/, "").trim();
-      } else {
-        // fallback: buscar una td con texto largo (no numérico) — normalmente es la columna ~9
-        nombre = "";
-        tds.each((j, td) => {
-          const txt = $(td).text().trim();
-          if (txt.length > 10 && /\D/.test(txt) && !/SI|NO|Presencial|Online/i.test(txt)) {
-            // heurística: si contiene palabras (no solo números) y no es "Presencial" ni "SI/NO"
-            nombre = txt;
-          }
-        });
-      }
-
-      // Profesor(es): preferir enlaces con cxml_profesor en href
-      let profesores = [];
-      $row.find('a[href*="cxml_profesor"]').each((k, a) => {
-        const p = $(a).text().trim();
-        if (p) profesores.push(p);
+      const nrc = $(tds[0]).text()//nrc
+      let sigla = $(tds[1]).text()
+      const seccion = $(tds[4]).text() //seccion
+      let nombre = $(tds[1]).attr("title"); //nombre del curso
+    
+      rows.push({
+        nrc,
+        sigla,
+        seccion,
+        nombre,
       });
-      // fallback: buscar la celda siguiente al nombre (si profesores vacíos)
-      if (profesores.length === 0) {
-        // heurística: la celda del profesor suele estar cerca de la del nombre
-        // buscamos la primera td después de la que contiene 'nombre' con >3 chars y comas/espacios
-        let foundIdx = -1;
-        tds.each((j, td) => {
-          const txt = $(td).text().trim();
-          if (txt && txt === nombre) foundIdx = j;
-        });
-        if (foundIdx >= 0) {
-          const maybeProf = $(tds[foundIdx + 1]).text().trim();
-          if (maybeProf) profesores = maybeProf.split(/\s*,\s*|\<br|\n/).map(s => s.replace(/\s+/g,' ').trim()).filter(Boolean);
-        }
-      }
-
-      const profesor = profesores.join(", ");
-
-      // Validar que nrc sea un número (evitamos filas de header)
-      if (nrc && /^[0-9]+$/.test(nrc)) {
-        rows.push({
-          nrc,
-          sigla,
-          seccion,
-          nombre,
-          profesor
-        });
-      }
+    
     });
 
-    if (format === "json") {
-      return res.json({ url, count: rows.length, rows });
-    }
+    
 
     // Generar HTML limpio
     const cleanHTML = `
@@ -157,7 +99,6 @@ app.get("/api/buscacursos", async (req, res) => {
               <th>Sigla</th>
               <th class="center">Sección</th>
               <th>Nombre</th>
-              <th>Profesor</th>
             </tr>
           </thead>
           <tbody>
@@ -166,8 +107,7 @@ app.get("/api/buscacursos", async (req, res) => {
                 <td class="center">${r.nrc}</td>
                 <td>${r.sigla}</td>
                 <td class="center">${r.seccion}</td>
-                <td>${escapeHtml(r.nombre)}</td>
-                <td>${escapeHtml(r.profesor)}</td>
+                <td>${r.nombre}</td>
               </tr>`).join("")}
           </tbody>
         </table>
@@ -176,27 +116,55 @@ app.get("/api/buscacursos", async (req, res) => {
     `;
 
     res.send(cleanHTML);
-  } catch (err) {
+
+  } 
+  
+  catch (err) {
     console.error("Error fetching/parsing buscacursos:", err);
     res.status(500).send("Error fetching data");
   }
+    });
+
+
+// Ruta para horarios predeterminados
+app.post('/backend/schedule2', (req, res) => {
+  //console.log("LLEGÓ A BACK")
+  const { to, horarios, nrcList } = req.body;
+
+  if (!to  || !horarios || nrcList.length === 0) {
+    return res.status(400).json({ 
+      ok: false, message: 'Faltan datos' });
+  }
+  //console.log("PASÓ VALIDACION")
+
+  const horario1 = horarios[0] || null;
+  const horario2 = horarios[1] || null;
+
+  try {
+    if(horario1){
+    scheduleMail2(to, horario1, nrcList);
+   }
+ 
+    if(horario2){
+    scheduleMail2(to, horario2, nrcList);
+  }
+
+    res.json({
+    ok: true,
+    message: `Correo programado correctamente para ${to}`,
+    nrcs: nrcList,
+  });
+
+
+
+  } catch (error) {
+    console.error('Error programando correo:', error);
+    res.status(500).json({ ok: false, message: 'Error interno del servidor.' });
+  }
 });
-
-// helper para escapar texto en HTML
-function escapeHtml(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-
 
 
 app.listen(PORT, () => {
   console.log(`Servidor backend escuchando en http://localhost:${PORT}`);
 });
-console.log('Esperando requests... Ctrl+C para salir');
+console.log('esperando req');

@@ -126,9 +126,38 @@
     <form id="scheduleForm">
       <label>Correo destinatario:</label>
       <input type="email" id="to" name="to" required />
+      <br>
+      <label>Selecciona horario(s) de envío:</label>
 
-      <label>Fecha y hora de envío:</label>
-      <input type="datetime-local" id="dateTime" name="dateTime" required />
+      <div class="horarios">
+        <label>
+          <input type="checkbox" name="horarios" value="07:50"> 7:50
+        </label>
+        <label>
+          <input type="checkbox" name="horarios" value="9:20"> 9:20
+        </label>
+        <label>
+          <input type="checkbox" name="horarios" value="10:50"> 10:50
+        </label>
+        <label>
+          <input type="checkbox" name="horarios" value="12:20"> 12:20
+        </label>
+        <label>
+          <input type="checkbox" name="horarios" value="13:50"> 13:50
+        </label>
+        <label>
+          <input type="checkbox" name="horarios" value="15:20"> 15:20
+        </label>
+        <label>
+          <input type="checkbox" name="horarios" value="16:50"> 16:50
+        </label>
+                </label>
+                <label>
+          <input type="checkbox" name="horarios" value="18:20"> 18:20
+        </label>
+      </div>
+      <br>
+
 
       <label>NRC(s) del curso:</label>
         <div id="nrcContainer">
@@ -154,49 +183,38 @@
   <script>
     const form = document.getElementById('scheduleForm');
     const nrcContainer = document.getElementById('nrcContainer');
-    const addNrcBtn = document.getElementById('addNrcBtn');
+    //const addNrcBtn = document.getElementById('addNrcBtn');
     const resultDiv = document.getElementById('result');
-
-    addNrcBtn.addEventListener('click', () => {
-      const currentCount = nrcContainer.querySelectorAll('.nrc-item').length;
-      if (currentCount >= 10) return;
-
-      const div = document.createElement('div');
-      div.classList.add('nrc-item');
-      div.innerHTML = `
-        <input type="text" name="nrc" class="nrcInput" placeholder="Ej: 12345" required />
-        <button type="button" class="remove-btn">✖</button>
-      `;
-      div.querySelector('.remove-btn').addEventListener('click', () => {
-        div.remove();
-        addNrcBtn.disabled = false;
-      });
-      nrcContainer.appendChild(div);
-
-      if (currentCount + 1 >= 10) addNrcBtn.disabled = true;
-    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const to = document.getElementById('to').value.trim();
-      const dateTime = document.getElementById('dateTime').value;
+      //const dateTime = document.getElementById('dateTime').value;
       const nrcInputs = document.querySelectorAll('.nrcInput');
       const nrcList = Array.from(nrcInputs)
         .map(input => input.value.trim())
         .filter(n => n !== "");
 
-      if (!to || !dateTime || nrcList.length === 0) {
-        show("⚠️ Faltan datos. Completa todos los campos.", true);
+      const horarios = Array.from(
+      document.querySelectorAll('input[name="horarios"]:checked')
+      ).map(h => h.value);
+
+      if (!to || horarios.length === 0 || nrcList.length === 0) {
+        show("Faltan datos", true);
         return;
       }
 
-      show("📤 Enviando petición...");
 
-      const payload = { to, dateTime, nrcList };
+
+
+
+      show(" Enviando petición...");
+
+      const payload = { to, horarios, nrcList };
 
       try {
-        const res = await fetch('/backend/schedule', {
+        const res = await fetch('/backend/schedule2', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
@@ -238,5 +256,21 @@
 
 
   </script>
+
+  <script>
+const checkboxes = document.querySelectorAll('input[name="horarios"]');
+
+checkboxes.forEach(cb => {
+  cb.addEventListener('change', () => {
+    const seleccionados = document.querySelectorAll('input[name="horarios"]:checked');
+
+    if (seleccionados.length > 2) {
+      cb.checked = false; // desmarca el último
+      alert("Solo puedes seleccionar un máximo de 2 horarios.");
+    }
+  });
+});
+</script>
+
 </body>
 </html>
