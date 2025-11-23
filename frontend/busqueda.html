@@ -3,243 +3,395 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Buscacupos UC</title>
+  <title>Buscar Cursos - Buscacupos UC</title>
   
+  <style>
+  .row {
+    display: flex;
+    gap: 20px;        /* separación entre los elementos */
+  }
+
+  .row .form-section {
+    flex: 1;          /* que ambos ocupen el mismo ancho */
+  }
+</style>
 
   <style>
+  :root {
+    --azul-oscuro: #0a3d62;
+    --azul-medio: #1e73be;
+    --azul-claro: #3498db;
+    --celeste: #e8f4f8;
+    --celeste-hover: #d6ecff;
+    --blanco: #ffffff;
+    --gris-claro: #e1ebf6;
+    --gris-borde: #dee2e6;
+    --gris-texto: #2c3e50;
+    --gris-secundario: #6c757d;
+    --verde-exito: #28a745;
+    --rojo-error: #dc3545;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--gris-claro);
+    color: var(--gris-texto);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  .container {
+    background: var(--blanco);
+    padding: 2.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 1200px;
+    border-top: 4px solid var(--azul-medio);
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gris-borde);
+  }
+
+  h1 {
+    color: var(--azul-oscuro);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+  }
+
+  h2 {
+    color: var(--gris-secundario);
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .back-link {
+    margin-bottom: 2rem;
+  }
+
+  .back-btn {
+    display: inline-block;
+    background: var(--blanco);
+    color: var(--azul-medio);
+    padding: 0.6rem 1.2rem;
+    border: 2px solid var(--azul-medio);
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .back-btn:hover {
+    background: var(--celeste);
+    border-color: var(--azul-oscuro);
+    color: var(--azul-oscuro);
+  }
+
+  .form-section {
+    margin-bottom: 1.5rem;
+    max-width: 20%;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--azul-oscuro);
+    font-size: 0.9rem;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.7rem 0.9rem;
+    border-radius: 6px;
+    border: 1px solid var(--gris-borde);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: var(--blanco);
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--azul-medio);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 115, 190, 0.1);
+  }
+
+  input[type="text"]::placeholder {
+    color: #adb5bd;
+  }
+
+  #submitBtn {
+    background: var(--azul-medio);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+  }
+
+  #submitBtn:hover {
+    background: var(--azul-oscuro);
+  }
+
+  #submitBtn:disabled {
+    background: var(--gris-borde);
+    cursor: not-allowed;
+  }
+
+  #result {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    background: var(--celeste);
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    border-left: 4px solid var(--azul-medio);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .error {
+    color: var(--rojo-error);
+    background: #f8d7da !important;
+    border-left: 4px solid var(--rojo-error) !important;
+  }
+
+  #preview {
+    width: 100%;
+    min-height: 600px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 6px;
+    margin-top: 1.5rem;
+    background: var(--blanco);
+  }
+
+  /* Estilos para los botones dentro del iframe */
+  .nrc-add-btn {
+    margin-left: 10px;
+    padding: 4px 10px;
+    font-size: 12px;
+    background: var(--azul-medio);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .nrc-add-btn:hover {
+    background: var(--azul-oscuro);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
     body {
-      font-family: "Segoe UI", Roboto, sans-serif;
-      background: #f6f8fa;
-      color: #222;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
+      padding: 10px;
     }
 
     .container {
-      background: white;
-      padding: 2rem;
-      margin-top: 3rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 90%;
-
+      padding: 1.5rem;
+      margin-top: 1rem;
     }
 
     h1 {
-      text-align: center;
-      color: #333;
+      font-size: 1.5rem;
     }
 
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
-      max-width: 300px;
+    h2 {
+      font-size: 0.85rem;
     }
 
-    input {
-  max-width: 300px;
-}
-
-
-    input[type="email"],
-    input[type="nombre"],
-    input[type="sigla"],
-    input[type="datetime-local"],
     input[type="text"] {
-      width: 100%;
-      padding: 0.5rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      margin-bottom: 1rem;
-      font-size: 1rem;
+      max-width: 100%;
     }
 
-    button {
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
+    #preview {
+       width: 100%;
       border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      max-width: 300px;
+      overflow: visible !important;
+    height: auto;
     }
+  }
 
-    #addNrcBtn {
-      background-color: #2d7ff9;
-      color: white;
-      margin-bottom: 1rem;
-    }
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
 
-    #addNrcBtn:disabled {
-      background-color: #a7c2f9;
-      cursor: not-allowed;
-    }
+  ::-webkit-scrollbar-track {
+    background: var(--gris-claro);
+  }
 
-    #submitBtn {
-      background-color: #28a745;
-      color: white;
-      width: 100%;
-      margin-top: 0.5rem;
-    }
+  ::-webkit-scrollbar-thumb {
+    background: var(--azul-medio);
+    border-radius: 4px;
+  }
 
-    #result {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      border-radius: 6px;
-      background: #f1f3f6;
-      font-family: monospace;
-      white-space: pre-wrap;
-    }
-
-    .error {
-      color: crimson;
-    }
-
-    .nrc-item {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      margin-bottom: 0.5rem;
-    }
-
-    .remove-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0.3rem 0.6rem;
-      cursor: pointer;
-    }
-
-    .remove-btn:hover {
-      background: #b02a37;
-    }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--azul-oscuro);
+  }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>BuscacuposUC</h1>
-    <h2>Programa el envío de correos con la información actualizada sobre tus cupos</h2>
-
-    <button type="button" onclick="window.location.href='index.html'">
-    Volver
-    </button>
-    <br>
-    <br>
-
-
-    <form id="scheduleForm">
-      <label>Nombre del curso:</label>
-      <input type="text" id="nombre" name="courseName"  />
-
-      <label>Sigla del cuso:</label>
-      <input type="text"  id="sigla" name="courseSigla"  />
-       <br>
-      <button type="submit" id="submitBtn"> + Buscar cursos que coincidan</button>
-    </form>
-
-    <div id="result" aria-live="polite"></div>
-        <iframe id="preview" 
-                style="width:100%; height:600px; border:1px solid #ddd; margin-top:20px;">
-        </iframe>
+    <div class="header">
+      <h1>Buscar Cursos</h1>
+      <h2>Encuentra el NRC de tus cursos para programar notificaciones</h2>
     </div>
 
+    <div class="back-link">
+      <button type="button" class="back-btn" onclick="window.location.href='index.html'">
+        Volver
+      </button>
+    </div>
+
+    <form id="scheduleForm">
+      <div class="row">
+        <div class="form-section">
+          <label for="nombre">Nombre del curso</label>
+          <input type="text" id="nombre" name="courseName" placeholder="Ej: Cálculo" />
+        </div>
+
+        <div class="form-section">
+          <label for="sigla">Sigla del curso</label>
+          <input type="text" id="sigla" name="courseSigla" placeholder="Ej: MAT1610" />
+        </div>
+      </div>
+
+      <button type="submit" id="submitBtn">  Buscar cursos que coincidan </button>
+    </form>
+
+    <div id="result" style="display:none;" aria-live="polite"></div>
+    
+    <iframe id="preview"></iframe>
+  </div>
+
   <script>
+    function extraerNRCs(doc) {
+      const nrcs = [];
+      const filas = doc.querySelectorAll("table tr");
 
-function extraerNRCs(doc) {
-  const nrcs = [];
-  const filas = doc.querySelectorAll("table tr");
+      filas.forEach(row => {
+        const celdas = row.querySelectorAll("td");
+        if (celdas.length > 0) {
+          const posibleNRC = celdas[0].innerText.trim();
+          if (/^\d{5}$/.test(posibleNRC)) {
+            nrcs.push(posibleNRC);
+          }
+        }
+      });
 
-  filas.forEach(row => {
-    const celdas = row.querySelectorAll("td");
-    if (celdas.length > 0) {
-      const posibleNRC = celdas[0].innerText.trim();
-      if (/^\d{5}$/.test(posibleNRC)) {
-        nrcs.push(posibleNRC);
+      return nrcs;
+    }
+
+    const form = document.getElementById("scheduleForm");
+    const nombreInput = document.getElementById("nombre");
+    const siglaInput = document.getElementById("sigla");
+    const iframe = document.getElementById("preview");
+    const resultDiv = document.getElementById("result");
+    const submitBtn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const nombre = nombreInput.value.trim();
+      const sigla = siglaInput.value.trim();
+
+      if (!nombre && !sigla) {
+        resultDiv.textContent = "Debes ingresar nombre o sigla del curso";
+        resultDiv.className = "error";
+        resultDiv.style.display = "block";
+        iframe.srcdoc = "";
+        return;
       }
-    }
-  });
 
-  return nrcs;
-}
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Buscando...";
+      resultDiv.style.display = "none";
 
-  const form = document.getElementById("scheduleForm");
-  const nombreInput = document.getElementById("nombre");
-  const siglaInput = document.getElementById("sigla");
-  const iframe = document.getElementById("preview");
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const nombre = nombreInput.value.trim();
-    const sigla = siglaInput.value.trim();
-
-    if (!nombre && !sigla) {
-      iframe.contentDocument.body.innerHTML = "<p style='color:red;'>Debes ingresar nombre O sigla</p>";
-      return;
-    }
-
-    //console.log("aaaaaaaaaaaaaaa")
-    //const url = `https://buscacursos.uc.cl/?cxml_semestre=2025-2&cxml_sigla=${encodeURIComponent(sigla)}&cxml_nombre=${encodeURIComponent(nombre)}&cxml_nrc=`;
-
-    try {
-      const url = `/api/buscacursos?sigla=${encodeURIComponent(sigla)}&nombre=${encodeURIComponent(nombre)}`;
-
+      try {
+        const url = `/api/buscacursos?sigla=${encodeURIComponent(sigla)}&nombre=${encodeURIComponent(nombre)}`;
         const res = await fetch(url);
         const html = await res.text();
 
         iframe.srcdoc = html;
-        // Esperamos un instante a que el iframe procese el HTML
 
+        // Esperamos a que el iframe procese el HTML
         setTimeout(() => {
-            const doc = iframe.contentDocument || iframe.contentWindow.document;
+          const doc = iframe.contentDocument || iframe.contentWindow.document;
 
-            // Buscar todas las filas de la tabla
-            const filas = doc.querySelectorAll("table tr");
+          // Buscar todas las filas de la tabla
+          const filas = doc.querySelectorAll("table tr");
 
-            filas.forEach(row => {
-                const celdas = row.querySelectorAll("td");
-                if (celdas.length === 0) return;
+          filas.forEach(row => {
+            const celdas = row.querySelectorAll("td");
+            if (celdas.length === 0) return;
 
-                const posibleNRC = celdas[0].innerText.trim();
+            const posibleNRC = celdas[0].innerText.trim();
 
-                // Si la primera celda es un NRC válido
-                if (/^\d{5}$/.test(posibleNRC)) {
+            // Si la primera celda es un NRC válido
+            if (/^\d{5}$/.test(posibleNRC)) {
+              // Crear botón individual
+              const btn = doc.createElement("button");
+              btn.textContent = "Agregar NRC";
+              btn.className = "nrc-add-btn";
+              btn.style.cssText =
+                "margin-left:10px; padding:4px 10px; font-size:12px; cursor:pointer; background:#1e73be; color:white; border:none; border-radius:4px;";
 
-                // Crear botón individual
-                const btn = doc.createElement("button");
-                btn.textContent = "Agregar NRC";
-                btn.style.cssText =
-                    "margin-left:10px; padding:4px 8px; font-size:12px; cursor:pointer;";
-
-                // Acción del botón
-                btn.addEventListener("click", () => {
-                    let existentes = JSON.parse(sessionStorage.getItem("nrc_importados") || "[]");
-                    if (!existentes.includes(posibleNRC)) {
-                    existentes.push(posibleNRC);
-                    }
-
-                    sessionStorage.setItem("nrc_importados", JSON.stringify(existentes));
-
-                    window.location.href = "index.html";
-                });
-
-                // Insertar botón en la fila, al lado del NRC
-                celdas[0].appendChild(btn);
+              // Acción del botón
+              btn.addEventListener("click", () => {
+                let existentes = JSON.parse(sessionStorage.getItem("nrc_importados") || "[]");
+                if (!existentes.includes(posibleNRC)) {
+                  existentes.push(posibleNRC);
                 }
-            });
-            }, 200);
 
-    } catch (err) {
-      iframe.contentDocument.body.innerHTML = "<p style='color:red;'>Error realizando GET</p>";
-    }
-  });
-</script>
+                sessionStorage.setItem("nrc_importados", JSON.stringify(existentes));
+                window.location.href = "index.html";
+              });
 
+              // Insertar botón en la fila, al lado del NRC
+              celdas[0].appendChild(btn);
+            }
+          });
 
+        }, 200);
+
+      } catch (err) {
+        resultDiv.textContent = "Error realizando la búsqueda. Intenta nuevamente.";
+        resultDiv.className = "error";
+        resultDiv.style.display = "block";
+        iframe.srcdoc = "<p style='color:#dc3545; padding:20px;'>Error al cargar los resultados</p>";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Buscar cursos que coincidan";
+      }
+    });
+  </script>
 </body>
 </html>

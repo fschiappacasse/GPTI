@@ -1,215 +1,474 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <link rel="icon" type="image/png" href="imagen.png">
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Buscacupos UC</title>
   
-
   <style>
+  :root {
+    --azul-oscuro: #0a3d62;
+    --azul-medio: #1e73be;
+    --azul-claro: #3498db;
+    --celeste: #a9e1f4;
+    --celeste-hover: #d6ecff;
+    --blanco: #ffffff;
+    --gris-claro: #e1ebf6;
+    --gris-borde: #dee2e6;
+    --gris-texto: #2c3e50;
+    --gris-secundario: #6c757d;
+    --verde-exito: #28a745;
+    --rojo-error: #dc3545;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--gris-claro);
+    color: var(--gris-texto);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+  }
+
+  .container {
+    background: var(--blanco);
+    padding: 2.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    width: 100%;
+    max-width: 600px;
+    border-top: 4px solid var(--azul-medio);
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gris-borde);
+  }
+
+  h1 {
+    color: var(--azul-oscuro);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+  }
+
+  h2 {
+    color: var(--gris-secundario);
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .search-link {
+    margin-bottom: 2rem;
+  }
+
+  .link-btn {
+    display: block;
+    background: var(--blanco);
+    color: var(--azul-medio);
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--azul-medio);
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .link-btn:hover {
+    background: var(--celeste);
+    border-color: var(--azul-oscuro);
+    color: var(--azul-oscuro);
+  }
+
+  .form-section {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--azul-oscuro);
+    font-size: 0.9rem;
+  }
+
+  input[type="email"],
+  input[type="text"] {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border-radius: 6px;
+    border: 1px solid var(--gris-borde);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background: var(--blanco);
+  }
+
+  input[type="email"]:focus,
+  input[type="text"]:focus {
+    border-color: var(--azul-medio);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(30, 115, 190, 0.1);
+  }
+
+  input[type="email"]::placeholder,
+  input[type="text"]::placeholder {
+    color: #adb5bd;
+  }
+
+  .horarios {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+    margin-top: 0.7rem;
+  }
+
+  .horarios label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0.6rem 0.5rem;
+    border: 1px solid var(--gris-borde);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 400;
+    font-size: 0.9rem;
+    background: var(--blanco);
+    margin: 0;
+  }
+
+  .horarios label:hover {
+    border-color: var(--azul-claro);
+    background: var(--celeste);
+  }
+
+  .horarios input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--azul-medio);
+  }
+
+  .horarios label:has(input:checked) {
+    border-color: var(--azul-medio);
+    background: var(--celeste-hover);
+    color: var(--azul-oscuro);
+    font-weight: 500;
+  }
+
+  #nrcContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-top: 0.7rem;
+  }
+
+  .nrc-item {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+
+  .nrc-item input {
+    flex: 1;
+  }
+
+  .add-nrc-btn {
+    background: var(--blanco);
+    color: var(--azul-medio);
+    border: 1px solid var(--azul-medio);
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+  }
+
+  .add-nrc-btn:hover {
+    background: var(--celeste);
+  }
+
+  .remove-btn {
+    background: var(--blanco);
+    color: var(--rojo-error);
+    border: 1px solid var(--rojo-error);
+    border-radius: 6px;
+    padding: 0.5rem 0.8rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .remove-btn:hover {
+    background: var(--rojo-error);
+    color: var(--blanco);
+  }
+
+  #submitBtn {
+    background: var(--azul-medio);
+    color: white;
+    width: 100%;
+    padding: 0.85rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+  }
+
+  #submitBtn:hover {
+    background: var(--azul-oscuro);
+  }
+
+  #submitBtn:disabled {
+    background: var(--gris-borde);
+    cursor: not-allowed;
+  }
+
+  #result {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 6px;
+    background: var(--celeste);
+    white-space: pre-wrap;
+    border-left: 4px solid var(--azul-medio);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .error {
+    color: var(--rojo-error);
+    background: #f8d7da !important;
+    border-left: 4px solid var(--rojo-error) !important;
+  }
+
+  .success {
+    color: var(--azul-medio);
+    background: #e1ebf6 !important;
+    border-left: 4px solid var(--azul-medio) !important;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 640px) {
     body {
-      font-family: "Segoe UI", Roboto, sans-serif;
-      background: #f6f8fa;
-      color: #222;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
+      padding: 10px;
     }
 
     .container {
-      background: white;
-      padding: 2rem;
-      margin-top: 3rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 500px;
+      padding: 1.5rem;
+      margin-top: 1rem;
     }
 
     h1 {
-      text-align: center;
-      color: #333;
+      font-size: 1.5rem;
     }
 
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
+    h2 {
+      font-size: 0.85rem;
     }
 
-    input[type="email"],
-    input[type="datetime-local"],
-    input[type="text"] {
-      width: 100%;
-      padding: 0.5rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-    }
-
-    button {
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    #addNrcBtn {
-      background-color: #2d7ff9;
-      color: white;
-      margin-bottom: 1rem;
-    }
-
-    #addNrcBtn:disabled {
-      background-color: #a7c2f9;
-      cursor: not-allowed;
-    }
-
-    #submitBtn {
-      background-color: #28a745;
-      color: white;
-      width: 100%;
-      margin-top: 0.5rem;
-    }
-
-    #result {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      border-radius: 6px;
-      background: #f1f3f6;
-      font-family: monospace;
-      white-space: pre-wrap;
-    }
-
-    .error {
-      color: crimson;
-    }
-
-    .nrc-item {
-      display: flex;
+    .horarios {
+      grid-template-columns: repeat(3, 1fr);
       gap: 0.5rem;
-      align-items: center;
-      margin-bottom: 0.5rem;
     }
 
-    .remove-btn {
-      background: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 0.3rem 0.6rem;
-      cursor: pointer;
+    .horarios label {
+      padding: 0.5rem 0.3rem;
+      font-size: 0.85rem;
     }
+  }
 
-    .remove-btn:hover {
-      background: #b02a37;
-    }
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--gris-claro);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--azul-medio);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--azul-oscuro);
+  }
+
+
+.header.logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;   
+  gap: 1rem;
+  text-align: left;          
+}
+
+.logo {
+  height: 100px;             
+  width: auto;
+  left: 0;
+}
+
+title-box {
+  text-align: center; /* mantiene h1 y h2 centrados */
+  width: 100%;        /* permite centrar perfecto */
+}
+
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="header logo-box">
+  <img src="imagen.png" alt="Logo" class="logo">
+  <div class="title-box">
     <h1>BuscacuposUC</h1>
-    <h2>Programa el envío de correos con la información actualizada sobre tus cupos</h2>
+    <h2>Programa el envío de correos</h2>
+  </div>
+</div>
 
-    <button type="button" onclick="window.location.href='busqueda.html'">
-    Busca el NRC de tu curso
-    </button>
-    <br>
-    <br>
 
+    <div class="search-link">
+      <button type="button" class="link-btn" onclick="window.location.href='busqueda.html'">
+        Busca el NRC de tu curso
+      </button>
+    </div>
 
     <form id="scheduleForm">
-      <label>Correo destinatario:</label>
-      <input type="email" id="to" name="to" required />
-      <br>
-      <label>Selecciona horario(s) de envío:</label>
-
-      <div class="horarios">
-        <label>
-          <input type="checkbox" name="horarios" value="07:50"> 7:50
-        </label>
-        <label>
-          <input type="checkbox" name="horarios" value="9:20"> 9:20
-        </label>
-        <label>
-          <input type="checkbox" name="horarios" value="10:50"> 10:50
-        </label>
-        <label>
-          <input type="checkbox" name="horarios" value="12:20"> 12:20
-        </label>
-        <label>
-          <input type="checkbox" name="horarios" value="13:50"> 13:50
-        </label>
-        <label>
-          <input type="checkbox" name="horarios" value="15:20"> 15:20
-        </label>
-        <label>
-          <input type="checkbox" name="horarios" value="16:50"> 16:50
-        </label>
-                </label>
-                <label>
-          <input type="checkbox" name="horarios" value="18:20"> 18:20
-        </label>
+      <div class="form-section">
+        <label for="to">Correo destinatario</label>
+        <input type="email" id="to" name="to" placeholder="ejemplo@uc.cl" required />
       </div>
-      <br>
 
-
-      <label>NRC(s) del curso:</label>
-        <div id="nrcContainer">
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="Ej: 13747" required /></div>
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
-          <div class="nrc-item"><input type="text" class="nrcInput" placeholder="opcional"  /></div>
+      <div class="form-section">
+        <label>Selecciona horario(s) de envío (máximo 2)</label>
+        <div class="horarios">
+          <label>
+            <input type="checkbox" name="horarios" value="07:50">
+            <span>7:50</span>
+          </label>
+          <label>
+            <input type="checkbox" name="horarios" value="9:20">
+            <span>9:20</span>
+          </label>
+          <label>
+            <input type="checkbox" name="horarios" value="10:50">
+            <span>10:50</span>
+          </label>
+          <label>
+            <input type="checkbox" name="horarios" value="12:20">
+            <span>12:20</span>
+          </label>
+          <label>
+            <input type="checkbox" name="horarios" value="13:50">
+            <span>13:50</span>
+          </label>
+          <label>
+            <input type="checkbox" name="horarios" value="15:20">
+            <span>15:20</span>
+          </label>
+          <label>
+            <input type="checkbox" name="horarios" value="16:50">
+            <span>16:50</span>
+          </label>
+          <label>
+            <input type="checkbox" name="horarios" value="18:20">
+            <span>18:20</span>
+          </label>
         </div>
+      </div>
 
+      <div class="form-section">
+        <label>NRC(s) del curso</label>
+        <div id="nrcContainer">
+          <div class="nrc-item">
+            <input type="text" class="nrcInput" placeholder="" required />
+          </div>
+        </div>
+        <button type="button" class="add-nrc-btn" id="addNrcBtn">Agregar otro NRC</button>
+      </div>
 
-
-      <button type="submit" id="submitBtn"> Programar correo</button>
+      <button type="submit" id="submitBtn">Programar correo</button>
     </form>
 
-    <div id="result" aria-live="polite"></div>
+    <div id="result" class="hidden" aria-live="polite"></div>
   </div>
 
   <script>
     const form = document.getElementById('scheduleForm');
     const nrcContainer = document.getElementById('nrcContainer');
-    //const addNrcBtn = document.getElementById('addNrcBtn');
+    const addNrcBtn = document.getElementById('addNrcBtn');
     const resultDiv = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Add NRC field
+    addNrcBtn.addEventListener('click', () => {
+      const nrcItem = document.createElement('div');
+      nrcItem.className = 'nrc-item';
+      nrcItem.innerHTML = `
+        <input type="text" class="nrcInput" placeholder="" />
+        <button type="button" class="remove-btn">Eliminar</button>
+      `;
+      
+      nrcItem.querySelector('.remove-btn').addEventListener('click', function() {
+        nrcItem.remove();
+      });
+      
+      nrcContainer.appendChild(nrcItem);
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const to = document.getElementById('to').value.trim();
-      //const dateTime = document.getElementById('dateTime').value;
       const nrcInputs = document.querySelectorAll('.nrcInput');
       const nrcList = Array.from(nrcInputs)
         .map(input => input.value.trim())
         .filter(n => n !== "");
 
       const horarios = Array.from(
-      document.querySelectorAll('input[name="horarios"]:checked')
+        document.querySelectorAll('input[name="horarios"]:checked')
       ).map(h => h.value);
 
       if (!to || horarios.length === 0 || nrcList.length === 0) {
-        show("Faltan datos", true);
+        show("Por favor completa todos los campos requeridos", true);
         return;
       }
 
-
-
-
-
-      show(" Enviando petición...");
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+      show("Enviando petición...", false, false);
 
       const payload = { to, horarios, nrcList };
 
@@ -225,52 +484,73 @@
         try { parsed = JSON.parse(text); } catch {}
 
         if (res.ok) {
-          show("Correo programado exitosamente\n");
+          show("Correo programado exitosamente.\nRecibirás notificaciones en los horarios seleccionados.", false, true);
+          form.reset();
         } else {
-          show("Error enviando petición, contactese con el equipo\n");
+          show("Error enviando petición, contacta con el equipo.\n" + (parsed?.message || text), true);
         }
       } catch (err) {
-        show("Error de red o interno, compruebe su conexión a internet\n" + err.toString(), true);
+        show("Error de red o interno.\nComprueba tu conexión a internet e intenta nuevamente.\n" + err.toString(), true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Programar correo';
       }
     });
 
-    function show(msg, isError = false) {
+    function show(msg, isError = false, isSuccess = false) {
       resultDiv.textContent = msg;
-      resultDiv.className = isError ? "error" : "";
+      resultDiv.className = isError ? "error" : (isSuccess ? "success" : "");
+      resultDiv.classList.remove('hidden');
     }
 
+    // Load NRCs from session storage
+    window.addEventListener("DOMContentLoaded", () => {
+      const data = sessionStorage.getItem("nrc_importados");
+      if (!data) return;
 
-  window.addEventListener("DOMContentLoaded", () => {
-  const data = sessionStorage.getItem("nrc_importados");
-  if (!data) return;
+      const nrcs = JSON.parse(data);
+      
+      // Clear existing container
+      nrcContainer.innerHTML = '';
+      
+      // Add NRC fields with values
+      nrcs.forEach((nrc, index) => {
+        const nrcItem = document.createElement('div');
+        nrcItem.className = 'nrc-item';
+        
+        if (index === 0) {
+          nrcItem.innerHTML = `
+            <input type="text" class="nrcInput" placeholder="Ej: 13747" value="${nrc}" required />
+          `;
+        } else {
+          nrcItem.innerHTML = `
+            <input type="text" class="nrcInput" placeholder="" value="${nrc}" />
+            <button type="button" class="remove-btn">Eliminar</button>
+          `;
+          nrcItem.querySelector('.remove-btn').addEventListener('click', function() {
+            nrcItem.remove();
+          });
+        }
+        
+        nrcContainer.appendChild(nrcItem);
+      });
+    });
 
-  const nrcs = JSON.parse(data);
-
-  const inputs = document.querySelectorAll(".nrcInput");
-
-  
-  inputs.forEach((input, i) => {
-    input.value = nrcs[i] || ""; 
-  });
-});
-
-
+    // Checkbox limit validation
+    const checkboxes = document.querySelectorAll('input[name="horarios"]');
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', () => {
+        const seleccionados = document.querySelectorAll('input[name="horarios"]:checked');
+        
+        if (seleccionados.length > 2) {
+          cb.checked = false;
+          show("Solo puedes seleccionar un máximo de 2 horarios.", true);
+          setTimeout(() => {
+            resultDiv.classList.add('hidden');
+          }, 3000);
+        }
+      });
+    });
   </script>
-
-  <script>
-const checkboxes = document.querySelectorAll('input[name="horarios"]');
-
-checkboxes.forEach(cb => {
-  cb.addEventListener('change', () => {
-    const seleccionados = document.querySelectorAll('input[name="horarios"]:checked');
-
-    if (seleccionados.length > 2) {
-      cb.checked = false; // desmarca el último
-      alert("Solo puedes seleccionar un máximo de 2 horarios.");
-    }
-  });
-});
-</script>
-
 </body>
 </html>
