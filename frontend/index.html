@@ -278,7 +278,6 @@
     border-left: 4px solid var(--azul-medio) !important;
   }
 
-  /* Responsive Design */
   @media (max-width: 640px) {
     body {
       padding: 10px;
@@ -308,7 +307,6 @@
     }
   }
 
-  /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -342,8 +340,8 @@
 }
 
 title-box {
-  text-align: center; /* mantiene h1 y h2 centrados */
-  width: 100%;        /* permite centrar perfecto */
+  text-align: center;
+  width: 100%;       
 }
 
   </style>
@@ -432,7 +430,6 @@ title-box {
     const resultDiv = document.getElementById('result');
     const submitBtn = document.getElementById('submitBtn');
 
-    // Add NRC field
     addNrcBtn.addEventListener('click', () => {
       const nrcItem = document.createElement('div');
       nrcItem.className = 'nrc-item';
@@ -503,17 +500,15 @@ title-box {
       resultDiv.classList.remove('hidden');
     }
 
-    // Load NRCs from session storage
+    // sacar los nrc que guardé en storage
     window.addEventListener("DOMContentLoaded", () => {
       const data = sessionStorage.getItem("nrc_importados");
       if (!data) return;
 
       const nrcs = JSON.parse(data);
       
-      // Clear existing container
       nrcContainer.innerHTML = '';
       
-      // Add NRC fields with values
       nrcs.forEach((nrc, index) => {
         const nrcItem = document.createElement('div');
         nrcItem.className = 'nrc-item';
@@ -536,7 +531,6 @@ title-box {
       });
     });
 
-    // Checkbox limit validation
     const checkboxes = document.querySelectorAll('input[name="horarios"]');
     checkboxes.forEach(cb => {
       cb.addEventListener('change', () => {
