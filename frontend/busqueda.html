@@ -8,11 +8,11 @@
   <style>
   .row {
     display: flex;
-    gap: 20px;        /* separación entre los elementos */
+    gap: 20px;       
   }
 
   .row .form-section {
-    flex: 1;          /* que ambos ocupen el mismo ancho */
+    flex: 1;    
   }
 </style>
 
@@ -191,7 +191,6 @@
     background: var(--blanco);
   }
 
-  /* Estilos para los botones dentro del iframe */
   .nrc-add-btn {
     margin-left: 10px;
     padding: 4px 10px;
@@ -208,7 +207,6 @@
     background: var(--azul-oscuro);
   }
 
-  /* Responsive Design */
   @media (max-width: 768px) {
     body {
       padding: 10px;
@@ -239,7 +237,6 @@
     }
   }
 
-  /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
   }
@@ -296,7 +293,6 @@
     function extraerNRCs(doc) {
       const nrcs = [];
       const filas = doc.querySelectorAll("table tr");
-
       filas.forEach(row => {
         const celdas = row.querySelectorAll("td");
         if (celdas.length > 0) {
@@ -342,13 +338,12 @@
 
         iframe.srcdoc = html;
 
-        // Esperamos a que el iframe procese el HTML
+        // esperamos a que el iframe procese el HTML
         setTimeout(() => {
           const doc = iframe.contentDocument || iframe.contentWindow.document;
-
-          // Buscar todas las filas de la tabla
           const filas = doc.querySelectorAll("table tr");
 
+          // 
           filas.forEach(row => {
             const celdas = row.querySelectorAll("td");
             if (celdas.length === 0) return;
@@ -357,14 +352,13 @@
 
             // Si la primera celda es un NRC válido
             if (/^\d{5}$/.test(posibleNRC)) {
-              // Crear botón individual
+
               const btn = doc.createElement("button");
               btn.textContent = "Agregar NRC";
               btn.className = "nrc-add-btn";
               btn.style.cssText =
                 "margin-left:10px; padding:4px 10px; font-size:12px; cursor:pointer; background:#1e73be; color:white; border:none; border-radius:4px;";
 
-              // Acción del botón
               btn.addEventListener("click", () => {
                 let existentes = JSON.parse(sessionStorage.getItem("nrc_importados") || "[]");
                 if (!existentes.includes(posibleNRC)) {
@@ -374,8 +368,7 @@
                 sessionStorage.setItem("nrc_importados", JSON.stringify(existentes));
                 window.location.href = "index.html";
               });
-
-              // Insertar botón en la fila, al lado del NRC
+              
               celdas[0].appendChild(btn);
             }
           });
